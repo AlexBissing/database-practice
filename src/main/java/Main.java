@@ -1,32 +1,27 @@
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Main {
-
-    private static final String URL = "jdbc:mysql://localhost:3306/mydbtest?autoReconnect=true&useSSL=false&serverTimezone=UTC";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "root_user";
-
-
     public static void main(String[] args) {
+        DBWorker worker = new DBWorker();
 
+        String query = "SELECT * FROM users";
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            Statement statement = connection.createStatement();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            Statement statement = worker.getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getInt("id"));
+                user.setUsername(resultSet.getString("username"));
+                user.setPassword(resultSet.getString("password"));
+                user.setEmail(resultSet.getString("email"));
 
-        try(Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD); Statement statement = connection.createStatement()) {
-            statement.executeUpdate("UPDATE users SET email = 'stevemail@mail.ru' WHERE id = 8");
-            statement.executeUpdate("UPDATE users SET email = 'pamelamail@mail.ru' WHERE id = 9");
-            statement.executeUpdate("UPDATE users SET email = 'sasandramail@mail.ru' WHERE id = 10");
-            statement.executeUpdate("UPDATE users SET email = 'tanyaemail@mail.ru' WHERE id = 11");
-
+                System.out.println(user);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
 
     }
 }
